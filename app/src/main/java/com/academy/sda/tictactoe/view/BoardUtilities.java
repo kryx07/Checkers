@@ -3,6 +3,7 @@ package com.academy.sda.tictactoe.view;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -54,8 +55,28 @@ public class BoardUtilities extends Activity {
         }
     }*/
 
-    public void drawBoard(Game game) {
+    public void updateBoard(final Game game) {
         int[][] board = game.getBoard();
+
+        for (int i = 0; i < board.length; ++i) {
+            TableRow row = (TableRow) tableLayout.getChildAt(i);
+
+            for (int j = 0; j < board.length; ++j) {
+                Button button = (Button) row.getChildAt(i);
+                if (board[i][j] == Game.PLAYER_A) {
+                    button.setText("A");
+                } else if (board[i][j] == Game.PLAYER_B) {
+                    button.setText("B");
+                }
+            }
+
+        }
+    }
+
+    public void drawBoard(final Game game) {
+        int[][] board = game.getBoard();
+
+        //tableLayout=new TableLayout(context);
 
         for (int i = 0; i < board.length; ++i) {
             TableRow row = new TableRow(context);
@@ -63,7 +84,7 @@ public class BoardUtilities extends Activity {
 
             for (int j = 0; j < board.length; ++j) {
                 final Button button = new Button(context);
-                button.setLayoutParams(new TableRow.LayoutParams(135, 135));
+                button.setLayoutParams(new TableRow.LayoutParams(100, 100));
 
                 button.setTag(new Coordinates(i, j));
 
@@ -85,8 +106,10 @@ public class BoardUtilities extends Activity {
                             firstCoordinates = coordinates;
                             firstMove = false;
                         } else {
-                            if (game.makeMove(firstCoordinates, coordinates) == Game.MoveType.MOVE_FINAL) {
-                                drawBoard(game);
+                            Game.MoveType moveType =game.makeMove(firstCoordinates, coordinates);
+                            Log.d(this.getClass().getSimpleName(), moveType.toString());
+                            if ( moveType== Game.MoveType.MOVE_FINAL) {
+                                updateBoard(game);
                             }
                             firstMove = true;
                         }

@@ -1,6 +1,8 @@
 package com.academy.sda.tictactoe.logic;
 
 
+import android.util.Log;
+
 import static com.academy.sda.tictactoe.logic.Game.MoveType.MOVE_FINAL;
 import static com.academy.sda.tictactoe.logic.Game.MoveType.MOVE_ILLEGAL;
 import static com.academy.sda.tictactoe.logic.Game.MoveType.MOVE_NOT_FINAL;
@@ -10,6 +12,7 @@ public class Game {
     public enum MoveType {
         MOVE_FINAL, MOVE_ILLEGAL, MOVE_NOT_FINAL;
     }
+
     //private Board board;
     public final static int PLAYER_NONE = 0;
     public final static int PLAYER_A = 1;
@@ -51,13 +54,35 @@ public class Game {
 
     public MoveType makeMove(Coordinates from, Coordinates to) {
 
-        if (from.equals(to) || !isCurrentPlayer(from) || isOutOfBounds(to) ||
-                !isFieldBlack(from) || !isFieldBlack(to) || !isValidDirection(from, to)) {
+        if (from.equals(to)) {
+            logDebug("Equal");
             return MOVE_ILLEGAL;
         }
+
+        if (!isCurrentPlayer(from)) {
+            logDebug("not your turn");
+            return MOVE_ILLEGAL;
+        }
+
+        /*if(isOutOfBounds(to)){
+
+        }*/
+
+        if (!isFieldBlack(from) || !isFieldBlack(to)) {
+            logDebug("NotBlack");
+            return MOVE_ILLEGAL;
+        }
+        if (!isValidDirection(from, to)) {
+            logDebug("Invalid Direction");
+            return MOVE_ILLEGAL;
+        }
+        logDebug("Initial check passed");
+
         if (isNeighbour(from, to)) {
+            logDebug("isNeighbour");
             //Regular moves
             if (isFieldEmpty(to)) {
+                logDebug("isEmpty");
                 //Pawn is moved(regular move) / flag informs the controller that the move is final
                 setField(to, currentPlayer);
                 currentPlayer = getEnemy(currentPlayer);
@@ -65,20 +90,25 @@ public class Game {
             }
         }
         if (!isCaptureDistance(from, to)) {
+            logDebug("not capture distance");
             return MOVE_ILLEGAL;
         } else {
             if (isEnemyInBetween(from, to)) {
+                logDebug("enemy is between");
                 if (isAnotherCapturePossibleFrom(to)) {
+                    logDebug("another capture is possible");
                     capture(from, to);
                     return MOVE_NOT_FINAL;
                 } else {
                     //Capturing move
+                    logDebug("capturing move");
                     capture(from, to);
                     currentPlayer = getEnemy(currentPlayer);
                     return MOVE_FINAL;
                 }
             }
         }
+        logDebug("No legal moves!");
         return MOVE_ILLEGAL;
     }
 
@@ -149,5 +179,9 @@ public class Game {
         currentPlayer = getEnemy(currentPlayer);
     }
 
+    private void logDebug(String msg) {
+        Log.d(this.getClass().getSimpleName(), msg);
+
+    }
 
 }
