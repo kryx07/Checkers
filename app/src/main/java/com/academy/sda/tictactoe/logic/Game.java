@@ -85,6 +85,7 @@ public class Game {
                 logDebug("isEmpty");
                 //Pawn is moved(regular move) / flag informs the controller that the move is final
                 setField(to, currentPlayer);
+                setField(from,PLAYER_NONE);
                 currentPlayer = getEnemy(currentPlayer);
                 return MOVE_FINAL;
             }

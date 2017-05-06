@@ -84,7 +84,7 @@ public class BoardUtilities extends Activity {
 
             for (int j = 0; j < board.length; ++j) {
                 final Button button = new Button(context);
-                button.setLayoutParams(new TableRow.LayoutParams(100, 100));
+                button.setLayoutParams(new TableRow.LayoutParams(135, 135));
 
                 button.setTag(new Coordinates(i, j));
 
@@ -115,7 +115,6 @@ public class BoardUtilities extends Activity {
                         }
                     }
                 });
-
 
                 row.addView(button);
             }
