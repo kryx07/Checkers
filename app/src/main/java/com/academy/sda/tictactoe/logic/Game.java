@@ -49,7 +49,7 @@ public class Game {
         }
     }
 
-    private MoveType makeMove(Coordinates from, Coordinates to) {
+    public MoveType makeMove(Coordinates from, Coordinates to) {
 
         if (from.equals(to) || !isCurrentPlayer(from) || isOutOfBounds(to) ||
                 !isFieldBlack(from) || !isFieldBlack(to) || !isValidDirection(from, to)) {

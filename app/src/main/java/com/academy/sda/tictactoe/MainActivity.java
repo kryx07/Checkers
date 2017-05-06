@@ -13,9 +13,8 @@ import com.academy.sda.tictactoe.view.BoardUtilities;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BoardUtilities boardUtilities = new BoardUtilities(this);
+    private BoardUtilities boardUtilities;
 
-    private boolean buttonClicked = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
         TableLayout tableLayout = (TableLayout) findViewById(R.id.board);
 
         Game game = new Game();
-        boardUtilities.drawBoard(tableLayout, game);
+        this.boardUtilities = new BoardUtilities(this, tableLayout);
+        boardUtilities.drawBoard(game);
 
     }
 
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
                         ((Coordinates) button.getTag()).getColumn());
 
 
-        buttonClicked =!buttonClicked;
     }
 
 

@@ -12,17 +12,17 @@ import android.widget.Toast;
 import com.academy.sda.tictactoe.logic.Coordinates;
 import com.academy.sda.tictactoe.logic.Game;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class BoardUtilities extends Activity {
 
     private Context context;
+    private TableLayout tableLayout;
 
-    List<Button> buttons = new ArrayList<>();
+    private boolean firstMove = true;
+    private Coordinates firstCoordinates;
 
-    public BoardUtilities(Context context) {
+    public BoardUtilities(Context context, TableLayout tableLayout) {
         this.context = context;
+        this.tableLayout = tableLayout;
     }
 
     /*public void drawBoard(TableLayout tableLayout) {
@@ -54,7 +54,7 @@ public class BoardUtilities extends Activity {
         }
     }*/
 
-    public void drawBoard(TableLayout tableLayout, Game game) {
+    public void drawBoard(Game game) {
         int[][] board = game.getBoard();
 
         for (int i = 0; i < board.length; ++i) {
@@ -76,22 +76,25 @@ public class BoardUtilities extends Activity {
                     button.setText("B");
                 }
                 button.setOnClickListener(new View.OnClickListener() {
+
                     @Override
                     public void onClick(View v) {
-                        makeShortToast(((Coordinates) button.getTag()).toString());
+                        makeShortToast(button.getTag().toString());
+                        Coordinates coordinates = (Coordinates) button.getTag();
+                        if (firstMove) {
+                            firstCoordinates = coordinates;
+                            firstMove = false;
+                        } else {
+                            if (game.makeMove(firstCoordinates, coordinates) == Game.MoveType.MOVE_FINAL) {
+                                drawBoard(game);
+                            }
+                            firstMove = true;
+                        }
                     }
                 });
+
+
                 row.addView(button);
-            }
-        }
-    }
-
-
-    public void setPawns(TableLayout tableLayout) {
-        for (Button b : buttons) {
-            if (b.getTag().equals(new Coordinates(1, 2))) {
-                b.setText("Dupa");
-                //DO WHAT YOU WANT
             }
         }
     }
