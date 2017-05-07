@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.academy.sda.checkers.model.Board;
 import com.academy.sda.checkers.model.Field;
 import com.academy.sda.checkers.logic.Game;
+import com.academy.sda.checkers.model.Pawn;
 import com.academy.sda.checkers.model.Player;
 
 public class BoardUtilities extends Activity {
@@ -65,13 +66,16 @@ public class BoardUtilities extends Activity {
             for (int j = 0; j < board.size(); ++j) {
                 Button button = (Button) row.getChildAt(j);
 
-                Player thisPlayer = board.getPlayer(new Field(i, j));
-                if (thisPlayer == Player.PLAYER_A) {
+                Pawn thisPawn = board.getPawn(new Field(i, j));
+                if (thisPawn.getPlayer() == Player.PLAYER_A) {
                     button.setText("A");
-                } else if (thisPlayer == Player.PLAYER_B) {
+                } else if (thisPawn.getPlayer() == Player.PLAYER_B) {
                     button.setText("B");
                 } else {
                     button.setText("");
+                }
+                if (thisPawn.isQueen()) {
+                    button.setText(button.getText() + "Q");
                 }
             }
 
@@ -90,19 +94,23 @@ public class BoardUtilities extends Activity {
                 final Button button = new Button(context);
                 button.setLayoutParams(new TableRow.LayoutParams(135, 135));
 
-                field=new Field(i,j);
+                field = new Field(i, j);
                 button.setTag(field);
 
                 if (field.isBlack()) {
                     button.setBackgroundColor(ContextCompat.getColor(context, android.R.color.darker_gray));
                 }
-                Player thisPlayer = board.getPlayer(new Field(i, j));
-                if (thisPlayer == Player.PLAYER_A) {
+
+                Pawn thisPawn = board.getPawn(new Field(i, j));
+                if (thisPawn.getPlayer() == Player.PLAYER_A) {
                     button.setText("A");
-                } else if (thisPlayer == Player.PLAYER_B) {
+                } else if (thisPawn.getPlayer() == Player.PLAYER_B) {
                     button.setText("B");
                 } else {
                     button.setText("");
+                }
+                if (thisPawn.isQueen()) {
+                    button.setText(button.getText() + "Q");
                 }
                 button.setOnClickListener(new View.OnClickListener() {
 
