@@ -1,4 +1,4 @@
-package com.academy.sda.tictactoe;
+package com.academy.sda.checkers;
 
 import org.junit.Test;
 

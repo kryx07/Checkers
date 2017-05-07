@@ -1,4 +1,4 @@
-package com.academy.sda.tictactoe.view;
+package com.academy.sda.checkers.view;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,8 +10,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
-import com.academy.sda.tictactoe.logic.Coordinates;
-import com.academy.sda.tictactoe.logic.Game;
+import com.academy.sda.checkers.logic.Coordinates;
+import com.academy.sda.checkers.logic.Game;
 
 public class BoardUtilities extends Activity {
 
@@ -62,13 +62,16 @@ public class BoardUtilities extends Activity {
             TableRow row = (TableRow) tableLayout.getChildAt(i);
 
             for (int j = 0; j < board.length; ++j) {
-                Button button = (Button) row.getChildAt(i);
+                Button button = (Button) row.getChildAt(j);
                 if (board[i][j] == Game.PLAYER_A) {
                     button.setText("A");
                 } else if (board[i][j] == Game.PLAYER_B) {
                     button.setText("B");
+                } else {
+                    button.setText("");
                 }
             }
+
 
         }
     }
@@ -107,9 +110,12 @@ public class BoardUtilities extends Activity {
                             firstMove = false;
                         } else {
                             Game.MoveType moveType =game.makeMove(firstCoordinates, coordinates);
-                            Log.d(this.getClass().getSimpleName(), moveType.toString());
+                            logDebug(moveType.toString());
                             if ( moveType== Game.MoveType.MOVE_FINAL) {
                                 updateBoard(game);
+                            } else if (moveType==Game.MoveType.MOVE_NOT_FINAL){
+                                updateBoard(game);
+                                makeShortToast("There is another capture possible");
                             }
                             firstMove = true;
                         }
@@ -131,5 +137,8 @@ public class BoardUtilities extends Activity {
                 ((Coordinates) button.getTag()).getColumn()) % 2 == 0;
     }
 
+    private void logDebug(String msg) {
+        Log.d(this.getClass().getSimpleName(), msg);
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.academy.sda.tictactoe;
+package com.academy.sda.checkers;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

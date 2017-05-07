@@ -1,4 +1,4 @@
-package com.academy.sda.tictactoe;
+package com.academy.sda.checkers;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,9 +7,9 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
-import com.academy.sda.tictactoe.logic.Coordinates;
-import com.academy.sda.tictactoe.logic.Game;
-import com.academy.sda.tictactoe.view.BoardUtilities;
+import com.academy.sda.checkers.logic.Coordinates;
+import com.academy.sda.checkers.logic.Game;
+import com.academy.sda.checkers.view.BoardUtilities;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.academy.sda.tictactoe.MainActivity">
+    tools:context="com.academy.sda.checkers.MainActivity">
 
     <TableLayout
         android:id="@+id/board"

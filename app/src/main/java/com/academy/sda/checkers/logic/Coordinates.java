@@ -1,4 +1,4 @@
-package com.academy.sda.tictactoe.logic;
+package com.academy.sda.checkers.logic;
 
 /**
  * Created by wd42 on 06.05.17.
