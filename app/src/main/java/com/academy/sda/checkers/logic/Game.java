@@ -3,7 +3,8 @@ package com.academy.sda.checkers.logic;
 
 import android.util.Log;
 
-import java.lang.reflect.Array;
+import com.academy.sda.checkers.model.Board;
+import com.academy.sda.checkers.model.Field;
 
 import static com.academy.sda.checkers.logic.Game.MoveType.MOVE_FINAL;
 import static com.academy.sda.checkers.logic.Game.MoveType.MOVE_ILLEGAL;
@@ -22,6 +23,8 @@ public class Game {
 
     private int currentPlayer;
 
+    private Board board2;
+
     private int[][] board = new int[8][8];
 
     public int[][] getBoard() {
@@ -30,27 +33,27 @@ public class Game {
 
     public Game() {
         currentPlayer = PLAYER_A;
-        Coordinates coordinates;
+        Field field;
         for (int i = 0; i <= 2; ++i) {
             for (int j = 0; j < 8; j++) {
-                coordinates = new Coordinates(i, j);
-                if (isFieldBlack(coordinates)) {
-                    setField(coordinates, PLAYER_A);
+                field = new Field(i, j);
+                if (isFieldBlack(field)) {
+                    setField(field, PLAYER_A);
                 }
             }
         }
 
         for (int i = 5; i <= 7; ++i) {
             for (int j = 0; j < 8; j++) {
-                coordinates = new Coordinates(i, j);
-                if (isFieldBlack(coordinates)) {
-                    setField(coordinates, PLAYER_B);
+                field = new Field(i, j);
+                if (isFieldBlack(field)) {
+                    setField(field, PLAYER_B);
                 }
             }
         }
     }
 
-    public MoveType makeMove(Coordinates from, Coordinates to) {
+    public MoveType makeMove(Field from, Field to) {
         logDebug("Attempting a move: from: " + from + "to: " + to);
         if (!initialCheck(from, to)) {
             return MOVE_ILLEGAL;
@@ -92,7 +95,7 @@ public class Game {
         return MOVE_ILLEGAL;
     }
 
-    private boolean initialCheck(Coordinates from, Coordinates to) {
+    private boolean initialCheck(Field from, Field to) {
         if (from.equals(to)) {
             logDebug("From and to coordinates are the same - no move!");
             return false;
@@ -116,21 +119,21 @@ public class Game {
         return true;
     }
 
-    private boolean isFieldBlack(Coordinates coordinates) {
-        return (coordinates.getRow() + coordinates.getColumn()) % 2 == 0;
+    private boolean isFieldBlack(Field field) {
+        return (field.getRow() + field.getColumn()) % 2 == 0;
     }
 
-    private boolean isOutOfBounds(Coordinates coordinates) {
-        return coordinates.getRow() < 0 || coordinates.getColumn() < 0 ||
-                coordinates.getRow() > 7 || coordinates.getColumn() > 7;
+    private boolean isOutOfBounds(Field field) {
+        return field.getRow() < 0 || field.getColumn() < 0 ||
+                field.getRow() > 7 || field.getColumn() > 7;
     }
 
-    private boolean isCurrentPlayer(Coordinates from) {
+    private boolean isCurrentPlayer(Field from) {
         int player = board[from.getRow()][from.getColumn()];
         return currentPlayer == player;
     }
 
-    private boolean isValidDirection(Coordinates from, Coordinates to) {
+    private boolean isValidDirection(Field from, Field to) {
         if (currentPlayer == PLAYER_A) {
             return from.getRow() < to.getRow();
         } else {
@@ -138,50 +141,50 @@ public class Game {
         }
     }
 
-    private boolean isNeighbour(Coordinates from, Coordinates to) {
+    private boolean isNeighbour(Field from, Field to) {
         return Math.abs(from.getRow() - to.getRow()) <= 1 &&
                 Math.abs(from.getColumn() - to.getColumn()) <= 1;
     }
 
-    private boolean isCaptureDistance(Coordinates from, Coordinates to) {
+    private boolean isCaptureDistance(Field from, Field to) {
         return Math.abs(from.getRow() - to.getRow()) == 2 &&
                 Math.abs(from.getColumn() - to.getColumn()) == 2;
     }
 
-    private boolean isEnemyInBetween(Coordinates from, Coordinates to) {
-        Coordinates fieldInBetween = getFieldInBetween(from, to);
+    private boolean isEnemyInBetween(Field from, Field to) {
+        Field fieldInBetween = getFieldInBetween(from, to);
         return board[fieldInBetween.getRow()][fieldInBetween.getColumn()] == getEnemy(currentPlayer);
     }
 
-    private Coordinates getFieldInBetween(Coordinates from, Coordinates to) {
-        return new Coordinates((from.getRow() + to.getRow()) / 2,
+    private Field getFieldInBetween(Field from, Field to) {
+        return new Field((from.getRow() + to.getRow()) / 2,
                 (from.getColumn() + to.getColumn()) / 2);
     }
 
-    private void setField(Coordinates field, int player) {
+    private void setField(Field field, int player) {
         board[field.getRow()][field.getColumn()] = player;
     }
 
-    private boolean isFieldEmpty(Coordinates coordinates) {
-        return board[coordinates.getRow()][coordinates.getColumn()] == PLAYER_NONE;
+    private boolean isFieldEmpty(Field field) {
+        return board[field.getRow()][field.getColumn()] == PLAYER_NONE;
     }
 
     private int getEnemy(int player) {
         return (-1) * player;
     }
 
-    private boolean isAnotherCapturePossibleFrom(Coordinates coordinates) {
-        return isCapturePossible(coordinates,
-                        new Coordinates(coordinates.getRow() + 2, coordinates.getColumn() + 2)) ||
-                isCapturePossible(coordinates,
-                        new Coordinates(coordinates.getRow() - 2, coordinates.getColumn() - 2)) ||
-                isCapturePossible(coordinates,
-                        new Coordinates(coordinates.getRow() + 2, coordinates.getColumn() - 2)) ||
-                isCapturePossible(coordinates,
-                        new Coordinates(coordinates.getRow() - 2, coordinates.getColumn() + 2));
+    private boolean isAnotherCapturePossibleFrom(Field field) {
+        return isCapturePossible(field,
+                        new Field(field.getRow() + 2, field.getColumn() + 2)) ||
+                isCapturePossible(field,
+                        new Field(field.getRow() - 2, field.getColumn() - 2)) ||
+                isCapturePossible(field,
+                        new Field(field.getRow() + 2, field.getColumn() - 2)) ||
+                isCapturePossible(field,
+                        new Field(field.getRow() - 2, field.getColumn() + 2));
     }
 
-    private boolean isCapturePossible(Coordinates from, Coordinates to) {
+    private boolean isCapturePossible(Field from, Field to) {
         boolean capturePossible;
         try {
             capturePossible = isFieldEmpty(to) && isEnemyInBetween(from, to) ;
@@ -194,14 +197,14 @@ public class Game {
 
     }
 
-    private void makeCapturingMove(Coordinates from, Coordinates to) {
+    private void makeCapturingMove(Field from, Field to) {
         setField(getFieldInBetween(from, to), PLAYER_NONE);
         setField(from, PLAYER_NONE);
         setField(to, currentPlayer);
 
     }
 
-    private void makeRegularMove(Coordinates from, Coordinates to) {
+    private void makeRegularMove(Field from, Field to) {
         setField(to, currentPlayer);
         setField(from, PLAYER_NONE);
         currentPlayer = getEnemy(currentPlayer);

@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
-import com.academy.sda.checkers.logic.Coordinates;
+import com.academy.sda.checkers.model.Field;
 import com.academy.sda.checkers.logic.Game;
 import com.academy.sda.checkers.view.BoardUtilities;
 
@@ -31,9 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClick(View view) {
         Button button = (Button) view;
-        Coordinates coordinates =
-                new Coordinates(((Coordinates) button.getTag()).getRow(),
-                        ((Coordinates) button.getTag()).getColumn());
+        Field field =
+                new Field(((Field) button.getTag()).getRow(),
+                        ((Field) button.getTag()).getColumn());
 
 
     }

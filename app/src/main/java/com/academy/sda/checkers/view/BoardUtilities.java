@@ -10,7 +10,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
-import com.academy.sda.checkers.logic.Coordinates;
+import com.academy.sda.checkers.model.Field;
 import com.academy.sda.checkers.logic.Game;
 
 public class BoardUtilities extends Activity {
@@ -19,7 +19,7 @@ public class BoardUtilities extends Activity {
     private TableLayout tableLayout;
 
     private boolean firstMove = true;
-    private Coordinates firstCoordinates;
+    private Field firstField;
 
     public BoardUtilities(Context context, TableLayout tableLayout) {
         this.context = context;
@@ -36,7 +36,7 @@ public class BoardUtilities extends Activity {
                 final Button button = new Button(context);
                 button.setLayoutParams(new TableRow.LayoutParams(135, 135));
 
-                button.setTag(new Coordinates(i, j));
+                button.setTag(new Field(i, j));
                 if (isBlack(button)) {
                     //button.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_dark));
                     button.setBackgroundColor(ContextCompat.getColor(context, android.R.color.darker_gray));
@@ -45,7 +45,7 @@ public class BoardUtilities extends Activity {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        makeShortToast(((Coordinates) button.getTag()).toString());
+                        makeShortToast(((Field) button.getTag()).toString());
                     }
                 });
 
@@ -89,7 +89,7 @@ public class BoardUtilities extends Activity {
                 final Button button = new Button(context);
                 button.setLayoutParams(new TableRow.LayoutParams(135, 135));
 
-                button.setTag(new Coordinates(i, j));
+                button.setTag(new Field(i, j));
 
                 if (isBlack(button)) {
                     button.setBackgroundColor(ContextCompat.getColor(context, android.R.color.darker_gray));
@@ -104,12 +104,12 @@ public class BoardUtilities extends Activity {
                     @Override
                     public void onClick(View v) {
                         makeShortToast(button.getTag().toString());
-                        Coordinates coordinates = (Coordinates) button.getTag();
+                        Field field = (Field) button.getTag();
                         if (firstMove) {
-                            firstCoordinates = coordinates;
+                            firstField = field;
                             firstMove = false;
                         } else {
-                            Game.MoveType moveType =game.makeMove(firstCoordinates, coordinates);
+                            Game.MoveType moveType =game.makeMove(firstField, field);
                             logDebug(moveType.toString());
                             if ( moveType== Game.MoveType.MOVE_FINAL) {
                                 updateBoard(game);
@@ -133,8 +133,8 @@ public class BoardUtilities extends Activity {
     }
 
     private boolean isBlack(Button button) {
-        return (((Coordinates) button.getTag()).getRow() +
-                ((Coordinates) button.getTag()).getColumn()) % 2 == 0;
+        return (((Field) button.getTag()).getRow() +
+                ((Field) button.getTag()).getColumn()) % 2 == 0;
     }
 
     private void logDebug(String msg) {

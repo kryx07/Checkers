@@ -1,16 +1,16 @@
-package com.academy.sda.checkers.logic;
+package com.academy.sda.checkers.model;
 
 /**
  * Created by wd42 on 06.05.17.
  */
 
-public class Coordinates {
+public class Field {
 
     private int row;
     private int column;
 
 
-    public Coordinates(int row, int column) {
+    public Field(int row, int column) {
         this.row = row;
         this.column = column;
     }
@@ -23,12 +23,16 @@ public class Coordinates {
         return column;
     }
 
+    public boolean isBlack() {
+        return (row + column) % 2 == 0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Coordinates that = (Coordinates) o;
+        Field that = (Field) o;
 
         if (row != that.row) return false;
         return column == that.column;
@@ -44,7 +48,7 @@ public class Coordinates {
 
     @Override
     public String toString() {
-        return "Coordinates{" +
+        return "Field{" +
                 "row=" + row +
                 ", column=" + column +
                 '}';
