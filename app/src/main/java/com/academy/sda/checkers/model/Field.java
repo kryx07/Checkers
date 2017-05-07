@@ -27,6 +27,12 @@ public class Field {
         return (row + column) % 2 == 0;
     }
 
+    public boolean isNeighbour(Field anotherField) {
+        return Math.abs(row - anotherField.getRow()) <= 1 &&
+                Math.abs(column - anotherField.getColumn()) <= 1 &&
+                !this.equals(anotherField);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -5,10 +5,13 @@ import android.util.Log;
 
 import com.academy.sda.checkers.model.Board;
 import com.academy.sda.checkers.model.Field;
+import com.academy.sda.checkers.model.Player;
 
 import static com.academy.sda.checkers.logic.Game.MoveType.MOVE_FINAL;
 import static com.academy.sda.checkers.logic.Game.MoveType.MOVE_ILLEGAL;
 import static com.academy.sda.checkers.logic.Game.MoveType.MOVE_NOT_FINAL;
+import static com.academy.sda.checkers.model.Player.PLAYER_A;
+import static com.academy.sda.checkers.model.Player.PLAYER_NONE;
 
 public class Game {
 
@@ -16,41 +19,17 @@ public class Game {
         MOVE_FINAL, MOVE_ILLEGAL, MOVE_NOT_FINAL;
     }
 
-    //private Board board;
-    public final static int PLAYER_NONE = 0;
-    public final static int PLAYER_A = 1;
-    public final static int PLAYER_B = -1;
+    private Player currentPlayer;
 
-    private int currentPlayer;
+    private Board board;
 
-    private Board board2;
-
-    private int[][] board = new int[8][8];
-
-    public int[][] getBoard() {
+    public Board getBoard() {
         return board;
     }
 
     public Game() {
         currentPlayer = PLAYER_A;
-        Field field;
-        for (int i = 0; i <= 2; ++i) {
-            for (int j = 0; j < 8; j++) {
-                field = new Field(i, j);
-                if (isFieldBlack(field)) {
-                    setField(field, PLAYER_A);
-                }
-            }
-        }
-
-        for (int i = 5; i <= 7; ++i) {
-            for (int j = 0; j < 8; j++) {
-                field = new Field(i, j);
-                if (isFieldBlack(field)) {
-                    setField(field, PLAYER_B);
-                }
-            }
-        }
+        board=new Board();
     }
 
     public MoveType makeMove(Field from, Field to) {
@@ -60,23 +39,24 @@ public class Game {
         }
         logDebug("Initial check passed");
 
-        if (isNeighbour(from, to)) {
-            logDebug("It is a neighbouring field");
+        if (from.isNeighbour(to)) {
+            logDebug("Target and source are neighbouring fields");
             //Regular moves
-            if (isFieldEmpty(to)) {
+            if (board.isFieldEmpty(to)) {
                 logDebug("The target field is empty");
                 //Pawn is moved(regular move) / flag informs the controller that the move is final
                 makeRegularMove(from, to);
+                currentPlayer =Player.getEnemy(currentPlayer);
                 logDebug("Regular move has been made from: " + from + " to: " + to);
                 return MOVE_FINAL;
             }
         }
         if (!isCaptureDistance(from, to)) {
-            logDebug("not makeCapturingMove distance");
+            logDebug("The attempted move is not of a capture distance");
             return MOVE_ILLEGAL;
         } else {
-            if (isEnemyInBetween(from, to)) {
-                logDebug("enemy is between");
+            if (isCapturePossible(from, to)) {
+                logDebug("Capture is possible");
                 if (isAnotherCapturePossibleFrom(to)) {
                     makeCapturingMove(from, to);
                     logDebug("Capturing move has been made from: " + from + " to: " + to);
@@ -85,7 +65,7 @@ public class Game {
                 } else {
                     //Capturing move
                     makeCapturingMove(from, to);
-                    currentPlayer = getEnemy(currentPlayer);
+                    currentPlayer = Player.getEnemy(currentPlayer);
                     logDebug("Capturing move has been made from: " + from + " to: " + to);
                     return MOVE_FINAL;
                 }
@@ -100,37 +80,25 @@ public class Game {
             logDebug("From and to coordinates are the same - no move!");
             return false;
         }
-        if (!isCurrentPlayer(from)) {
-            logDebug("Not your turn");
+        Player clickedPlayer = board.getPlayer(from);
+        if (!(clickedPlayer==currentPlayer)) {
+            logDebug("It's not the turn of "+ clickedPlayer);
             return false;
         }
-        if (isOutOfBounds(to)) {
+        if (board.isOutOfBounds(to)) {
             logDebug("Move out of board's bounds");
             return false;
         }
-        if (!isFieldBlack(from) || !isFieldBlack(to)) {
+        if (!from.isBlack() || !to.isBlack()) {
             logDebug("Source or target field is not black");
             return false;
         }
-        if (!isValidDirection(from, to) && !isEnemyInBetween(from, to)) {
+        //If it's a regular move we need to check direction, if it's a capture- direction doesn't matter
+        if (!isValidDirection(from, to) && !isCapturePossible(from, to)) {
             logDebug("Invalid Direction");
             return false;
         }
         return true;
-    }
-
-    private boolean isFieldBlack(Field field) {
-        return (field.getRow() + field.getColumn()) % 2 == 0;
-    }
-
-    private boolean isOutOfBounds(Field field) {
-        return field.getRow() < 0 || field.getColumn() < 0 ||
-                field.getRow() > 7 || field.getColumn() > 7;
-    }
-
-    private boolean isCurrentPlayer(Field from) {
-        int player = board[from.getRow()][from.getColumn()];
-        return currentPlayer == player;
     }
 
     private boolean isValidDirection(Field from, Field to) {
@@ -141,36 +109,13 @@ public class Game {
         }
     }
 
-    private boolean isNeighbour(Field from, Field to) {
-        return Math.abs(from.getRow() - to.getRow()) <= 1 &&
-                Math.abs(from.getColumn() - to.getColumn()) <= 1;
-    }
-
     private boolean isCaptureDistance(Field from, Field to) {
         return Math.abs(from.getRow() - to.getRow()) == 2 &&
                 Math.abs(from.getColumn() - to.getColumn()) == 2;
     }
 
     private boolean isEnemyInBetween(Field from, Field to) {
-        Field fieldInBetween = getFieldInBetween(from, to);
-        return board[fieldInBetween.getRow()][fieldInBetween.getColumn()] == getEnemy(currentPlayer);
-    }
-
-    private Field getFieldInBetween(Field from, Field to) {
-        return new Field((from.getRow() + to.getRow()) / 2,
-                (from.getColumn() + to.getColumn()) / 2);
-    }
-
-    private void setField(Field field, int player) {
-        board[field.getRow()][field.getColumn()] = player;
-    }
-
-    private boolean isFieldEmpty(Field field) {
-        return board[field.getRow()][field.getColumn()] == PLAYER_NONE;
-    }
-
-    private int getEnemy(int player) {
-        return (-1) * player;
+        return board.getPlayer(board.getFieldInBetween(from,to))==Player.getEnemy(currentPlayer);
     }
 
     private boolean isAnotherCapturePossibleFrom(Field field) {
@@ -187,7 +132,7 @@ public class Game {
     private boolean isCapturePossible(Field from, Field to) {
         boolean capturePossible;
         try {
-            capturePossible = isFieldEmpty(to) && isEnemyInBetween(from, to) ;
+            capturePossible = board.isFieldEmpty(to) && isEnemyInBetween(from, to) ;
         } catch (ArrayIndexOutOfBoundsException e){
             logDebug("Is capture from " + from + " to " + to + " possible? " + false);
             return false;
@@ -198,16 +143,15 @@ public class Game {
     }
 
     private void makeCapturingMove(Field from, Field to) {
-        setField(getFieldInBetween(from, to), PLAYER_NONE);
-        setField(from, PLAYER_NONE);
-        setField(to, currentPlayer);
-
+        board.setField(board.getFieldInBetween(from,to),PLAYER_NONE);
+        board.setField(from,PLAYER_NONE);
+        board.setField(to,currentPlayer);
     }
 
     private void makeRegularMove(Field from, Field to) {
-        setField(to, currentPlayer);
-        setField(from, PLAYER_NONE);
-        currentPlayer = getEnemy(currentPlayer);
+        board.setField(to,currentPlayer);
+        board.setField(from,PLAYER_NONE);
+
     }
 
     private void logDebug(String msg) {

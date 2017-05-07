@@ -10,8 +10,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
+import com.academy.sda.checkers.model.Board;
 import com.academy.sda.checkers.model.Field;
 import com.academy.sda.checkers.logic.Game;
+import com.academy.sda.checkers.model.Player;
 
 public class BoardUtilities extends Activity {
 
@@ -56,16 +58,17 @@ public class BoardUtilities extends Activity {
     }*/
 
     public void updateBoard(final Game game) {
-        int[][] board = game.getBoard();
+        Board board = game.getBoard();
 
-        for (int i = 0; i < board.length; ++i) {
+        for (int i = 0; i < board.size(); ++i) {
             TableRow row = (TableRow) tableLayout.getChildAt(i);
-
-            for (int j = 0; j < board.length; ++j) {
+            for (int j = 0; j < board.size(); ++j) {
                 Button button = (Button) row.getChildAt(j);
-                if (board[i][j] == Game.PLAYER_A) {
+
+                Player thisPlayer = board.getPlayer(new Field(i, j));
+                if (thisPlayer == Player.PLAYER_A) {
                     button.setText("A");
-                } else if (board[i][j] == Game.PLAYER_B) {
+                } else if (thisPlayer == Player.PLAYER_B) {
                     button.setText("B");
                 } else {
                     button.setText("");
@@ -77,27 +80,29 @@ public class BoardUtilities extends Activity {
     }
 
     public void drawBoard(final Game game) {
-        int[][] board = game.getBoard();
-
-        //tableLayout=new TableLayout(context);
-
-        for (int i = 0; i < board.length; ++i) {
+        Board board = game.getBoard();
+        Field field;
+        for (int i = 0; i < board.size(); ++i) {
             TableRow row = new TableRow(context);
             tableLayout.addView(row);
 
-            for (int j = 0; j < board.length; ++j) {
+            for (int j = 0; j < board.size(); ++j) {
                 final Button button = new Button(context);
                 button.setLayoutParams(new TableRow.LayoutParams(135, 135));
 
-                button.setTag(new Field(i, j));
+                field=new Field(i,j);
+                button.setTag(field);
 
-                if (isBlack(button)) {
+                if (field.isBlack()) {
                     button.setBackgroundColor(ContextCompat.getColor(context, android.R.color.darker_gray));
                 }
-                if (board[i][j] == Game.PLAYER_A) {
+                Player thisPlayer = board.getPlayer(new Field(i, j));
+                if (thisPlayer == Player.PLAYER_A) {
                     button.setText("A");
-                } else if (board[i][j] == Game.PLAYER_B) {
+                } else if (thisPlayer == Player.PLAYER_B) {
                     button.setText("B");
+                } else {
+                    button.setText("");
                 }
                 button.setOnClickListener(new View.OnClickListener() {
 
@@ -109,11 +114,11 @@ public class BoardUtilities extends Activity {
                             firstField = field;
                             firstMove = false;
                         } else {
-                            Game.MoveType moveType =game.makeMove(firstField, field);
+                            Game.MoveType moveType = game.makeMove(firstField, field);
                             logDebug(moveType.toString());
-                            if ( moveType== Game.MoveType.MOVE_FINAL) {
+                            if (moveType == Game.MoveType.MOVE_FINAL) {
                                 updateBoard(game);
-                            } else if (moveType==Game.MoveType.MOVE_NOT_FINAL){
+                            } else if (moveType == Game.MoveType.MOVE_NOT_FINAL) {
                                 updateBoard(game);
                                 makeShortToast("There is another capture possible");
                             }

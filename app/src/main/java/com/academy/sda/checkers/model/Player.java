@@ -6,11 +6,13 @@ package com.academy.sda.checkers.model;
 
 public enum Player {
 
-    PLAYER_NONE(0),PLAYER_A(1),PLAYER_B(-1);
+    PLAYER_NONE("No player", 0), PLAYER_A("Player A", 1), PLAYER_B("Player B", -1);
 
+    private String description;
     private int value;
 
-    Player(int value) {
+    Player(String description, int value) {
+        this.description = description;
         this.value = value;
     }
 
@@ -18,16 +20,21 @@ public enum Player {
         return value;
     }
 
-    public Player getPlayerByValue(int value){
-        for(Player p: values()){
-            if(p.value==value){
+    private static Player getPlayerByValue(int value) {
+        for (Player p : values()) {
+            if (p.value == value) {
                 return p;
             }
         }
         return null;
     }
 
-    public Player getEnemy(Player player){
-        return getPlayerByValue(player.value*(-1));
+    public static Player getEnemy(Player player) {
+        return getPlayerByValue(player.value * (-1));
+    }
+
+    @Override
+    public String toString() {
+        return description;
     }
 }
