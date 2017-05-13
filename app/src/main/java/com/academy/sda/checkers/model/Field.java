@@ -1,9 +1,5 @@
 package com.academy.sda.checkers.model;
 
-/**
- * Created by wd42 on 06.05.17.
- */
-
 public class Field {
 
     private int row;
@@ -40,8 +36,7 @@ public class Field {
 
         Field that = (Field) o;
 
-        if (row != that.row) return false;
-        return column == that.column;
+        return row == that.row && column == that.column;
 
     }
 
@@ -54,9 +49,6 @@ public class Field {
 
     @Override
     public String toString() {
-        return "Field{" +
-                "row=" + row +
-                ", column=" + column +
-                '}';
+        return "Field{" + row+"," + column + '}';
     }
 }

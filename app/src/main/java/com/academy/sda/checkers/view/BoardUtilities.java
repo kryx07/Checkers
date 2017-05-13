@@ -10,7 +10,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
-import com.academy.sda.checkers.logic.Move;
+import com.academy.sda.checkers.model.Move;
 import com.academy.sda.checkers.model.Board;
 import com.academy.sda.checkers.model.Field;
 import com.academy.sda.checkers.logic.Game;

@@ -3,22 +3,21 @@ package com.academy.sda.checkers.logic;
 
 import android.util.Log;
 
-import com.academy.sda.checkers.model.Board;
-import com.academy.sda.checkers.model.Field;
-import com.academy.sda.checkers.model.Pawn;
-import com.academy.sda.checkers.model.Player;
+import com.academy.sda.checkers.logic.validators.GeneralMoveValidator;
+import com.academy.sda.checkers.logic.validators.MoveValidator;
+import com.academy.sda.checkers.logic.validators.PawnMoveValidator;
+import com.academy.sda.checkers.logic.validators.QueenMoveValidator;
+import com.academy.sda.checkers.model.*;
 
-import java.util.Arrays;
+import java.util.List;
 
-import static com.academy.sda.checkers.logic.Move.MoveType.*;
-import static com.academy.sda.checkers.model.Player.PLAYER_A;
-import static com.academy.sda.checkers.model.Player.PLAYER_B;
-import static com.academy.sda.checkers.model.Player.PLAYER_NONE;
+import static com.academy.sda.checkers.model.Move.MoveType.*;
+import static com.academy.sda.checkers.model.Player.*;
 
 public class Game {
 
+    private MoveValidator moveValidator;
     private Player currentPlayer;
-
     private Board board;
 
     public Board getBoard() {
@@ -26,29 +25,31 @@ public class Game {
     }
 
     public Game() {
-        currentPlayer = PLAYER_A;
-        board = new Board();
+        this.currentPlayer = PLAYER_A;
+        this.board = new Board();
     }
 
     public Move.MoveType attemptMove(Move move) {
+
         logDebug("Attempting a move: from: " + move.getFrom() + "to: " + move.getTo());
-        if (!isMoveFormallyImpossible(move)) {
+        moveValidator = new GeneralMoveValidator(board, currentPlayer);
+        if (moveValidator.validate(move)==MOVE_ILLEGAL) {
             return MOVE_ILLEGAL;
         }
         logDebug("Initial check passed");
 
-        if (board.getPawn(move.getFrom()).isQueen()) {
-            logDebug("Attempting to move Queen");
-            return moveQueen();
-        } else {
-            logDebug("Attempting to move Pawn");
-            return movePawn(move);
-        }
+        return movePawn(move);
     }
 
     private Move.MoveType movePawn(Move move) {
-        PawnMoveValidator pawnMoveValidator = new PawnMoveValidator(currentPlayer, board);
-        Move.MoveType moveType = pawnMoveValidator.check(move);
+        if (board.getPawn(move.getFrom()).isQueen()) {
+            logDebug("Attempting to move Queen");
+            moveValidator = new QueenMoveValidator(currentPlayer, board);
+        } else {
+            logDebug("Attempting to move Pawn");
+            moveValidator = new PawnMoveValidator(currentPlayer, board);
+        }
+        Move.MoveType moveType = moveValidator.validate(move);
 
         switch (moveType) {
             case MOVE_FINAL: {
@@ -78,33 +79,6 @@ public class Game {
         return moveType;
     }
 
-    private Move.MoveType moveQueen() {
-
-        return null;
-    }
-
-    private boolean isMoveFormallyImpossible(Move move) {
-        if (move.getFrom().equals(move.getTo())) {
-            logDebug("From and to coordinates are the same - no move!");
-            return false;
-        }
-        Player clickedPlayer = board.getPawn(move.getFrom()).getPlayer();
-        if (!(clickedPlayer == currentPlayer)) {
-            logDebug("It's not the turn of " + clickedPlayer);
-            return false;
-        }
-        if (board.isOutOfBounds(move.getTo())) {
-            logDebug("Move out of board's bounds");
-            return false;
-        }
-        if (!move.getFrom().isBlack() || !move.getTo().isBlack()) {
-            logDebug("Source or target field is not black");
-            return false;
-        }
-        //If it's a regular check we need to check direction, if it's a capture- direction doesn't matter
-        return true;
-    }
-
     private void makeRegularMove(Move move) {
         board.setField(move.getTo(), board.getPawn(move.getFrom()));
         board.setField(move.getFrom(), new Pawn(PLAYER_NONE));
@@ -115,14 +89,19 @@ public class Game {
 
     }
 
-
     private void makeCapturingMove(Move move) {
         board.setField(move.getTo(), board.getPawn(move.getFrom()));
-        board.setField(board.getFieldInBetween(move), new Pawn(PLAYER_NONE));
         board.setField(move.getFrom(), new Pawn(PLAYER_NONE));
 
-        if (isEndOfBoard(move.getTo())) {
-            makeQueen(move.getTo());
+        List<Field> fieldsBetween = board.getFieldsInBetween(move);
+        for (int i = 0; i < fieldsBetween.size(); ++i) {
+            board.setField(fieldsBetween.get(i), new Pawn(PLAYER_NONE));
+        }
+
+        if (!board.getPawn(move.getFrom()).isQueen()) {
+            if (isEndOfBoard(move.getTo())) {
+                makeQueen(move.getTo());
+            }
         }
     }
 

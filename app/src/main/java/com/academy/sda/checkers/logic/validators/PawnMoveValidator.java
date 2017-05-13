@@ -1,15 +1,16 @@
-package com.academy.sda.checkers.logic;
+package com.academy.sda.checkers.logic.validators;
 
 import android.util.Log;
 
 import com.academy.sda.checkers.model.Board;
 import com.academy.sda.checkers.model.Field;
+import com.academy.sda.checkers.model.Move;
 import com.academy.sda.checkers.model.Player;
 
-import static com.academy.sda.checkers.logic.Move.MoveType.*;
+import static com.academy.sda.checkers.model.Move.MoveType.*;
 import static com.academy.sda.checkers.model.Player.*;
 
-public class PawnMoveValidator {
+public class PawnMoveValidator implements MoveValidator {
 
     private Player currentPlayer;
     private Board board;
@@ -19,7 +20,8 @@ public class PawnMoveValidator {
         this.board = board;
     }
 
-    public Move.MoveType check(Move move) {
+    @Override
+    public Move.MoveType validate(Move move) {
         if (!isValidDirection(move) && !isCapturePossible(move)) {
             logDebug("Invalid Direction");
             return MOVE_ILLEGAL;
