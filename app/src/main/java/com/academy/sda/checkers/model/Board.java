@@ -2,7 +2,14 @@ package com.academy.sda.checkers.model;
 
 import android.util.Log;
 
-import static com.academy.sda.checkers.model.Player.*;
+import com.academy.sda.checkers.logic.Move;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.academy.sda.checkers.model.Player.PLAYER_A;
+import static com.academy.sda.checkers.model.Player.PLAYER_B;
+import static com.academy.sda.checkers.model.Player.PLAYER_NONE;
 
 public class Board {
 
@@ -46,7 +53,7 @@ public class Board {
 
     public Pawn getPawn(Field field) {
         Pawn pawn = board[field.getRow()][field.getColumn()];
-        return pawn==null ?new Pawn(PLAYER_NONE) : pawn;
+        return pawn == null ? new Pawn(PLAYER_NONE) : pawn;
     }
 
     public void setField(Field field, Pawn pawn) {
@@ -59,9 +66,51 @@ public class Board {
         return thisPlayer == PLAYER_NONE;
     }
 
-    public Field getFieldInBetween(Field f1, Field f2) {
-        return new Field((f1.getRow() + f2.getRow()) / 2,
-                (f1.getColumn() + f2.getColumn()) / 2);
+    public Field getFieldInBetween(Move move) {
+        return new Field((move.getFrom().getRow() + move.getTo().getRow()) / 2,
+                (move.getFrom().getColumn() + move.getTo().getColumn()) / 2);
+    }
+
+
+
+    public List<Field> getFieldsInBetween(Move move) {
+
+        List<Field> fields = new ArrayList<>();
+        Field newField = new Field(-1, -1);
+        Move.Direction direction = move.getDirection();
+
+        int counter = 1;
+        switch (direction) {
+            case SOUTH_EAST:
+                while (!newField.isNeighbour(move.getFrom())) {
+                    newField = new Field(move.getTo().getRow() - counter, move.getTo().getColumn() - counter);
+                    fields.add(newField);
+                    ++counter;
+                }
+                break;
+            case NORTH_WEST:
+                while (!newField.isNeighbour(move.getFrom())) {
+                    newField = new Field(move.getTo().getRow() + counter, move.getTo().getColumn() + counter);
+                    fields.add(newField);
+                    ++counter;
+                }
+                break;
+            case SOUTH_WEST:
+                while (!newField.isNeighbour(move.getFrom())) {
+                    newField = new Field(move.getTo().getRow() - counter, move.getTo().getColumn() + counter);
+                    fields.add(newField);
+                    ++counter;
+                }
+                break;
+            case NORTH_EAST:
+                while (!newField.isNeighbour(move.getFrom())) {
+                    newField = new Field(move.getTo().getRow() + counter, move.getTo().getColumn() - counter);
+                    fields.add(newField);
+                    ++counter;
+                }
+                break;
+        }
+        return fields;
     }
 
 
@@ -75,6 +124,9 @@ public class Board {
     }
 
     private void logDebug(String msg) {
-        Log.d(this.getClass().getSimpleName(), msg);
+        Log.e(this.getClass().getSimpleName(), msg);
     }
+
+
+
 }

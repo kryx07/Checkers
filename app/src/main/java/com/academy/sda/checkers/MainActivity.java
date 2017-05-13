@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
                         ((Field) button.getTag()).getColumn());
 
 
+
+
     }
 
 
