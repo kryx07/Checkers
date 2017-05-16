@@ -7,6 +7,10 @@ import com.academy.sda.checkers.model.Field;
 import com.academy.sda.checkers.model.Move;
 import com.academy.sda.checkers.model.Player;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static com.academy.sda.checkers.model.Move.MoveType.*;
 import static com.academy.sda.checkers.model.Player.*;
 
@@ -22,6 +26,9 @@ public class PawnMoveValidator implements MoveValidator {
 
     @Override
     public Move.MoveType validate(Move move) {
+
+        logDebug(getValidMovesFrom(move.getFrom()).toString());
+
         if (!isValidDirection(move) && !isCapturePossible(move)) {
             logDebug("Invalid Direction");
             return MOVE_ILLEGAL;
@@ -98,7 +105,31 @@ public class PawnMoveValidator implements MoveValidator {
 
     }
 
-   private void logDebug(String msg) {
+    private Set<Move> getValidMovesFrom(Field field) {
+
+        Set<Move> validMoves = new HashSet<>();
+        Field tmpField = field;
+        Move potentialMove;
+        for (Move.Direction direction : Move.Direction.values()) {
+            for (int i = 0; i < 2; ++i) {
+                potentialMove = new Move(field, tmpField);
+                if (board.isFieldEmpty(potentialMove.getTo()) && isValidDirection(potentialMove)) {
+                    validMoves.add(potentialMove);
+                } else {
+                    if (isEnemyInBetween(potentialMove)) {
+                        validMoves.add(potentialMove);
+                    }
+                }
+                tmpField = board.move(tmpField, direction);
+            }
+            tmpField = field;
+        }
+
+        return validMoves;
+    }
+
+
+    private void logDebug(String msg) {
         Log.e(this.getClass().getSimpleName(), msg);
     }
 
