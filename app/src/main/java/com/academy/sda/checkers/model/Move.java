@@ -28,7 +28,7 @@ public class Move {
     }
 
     public enum Direction {
-        NORTH_EAST(-1,1), NORTH_WEST(-1,-1), SOUTH_EAST(1,1), SOUTH_WEST(1,-1);
+        NORTH_EAST(-1, 1), NORTH_WEST(-1, -1), SOUTH_EAST(1, 1), SOUTH_WEST(1, -1);
 
         private int rowOffset;
         private int columnOffset;
@@ -62,14 +62,42 @@ public class Move {
         }
     }
 
-    public Direction getReverseDirection(Direction direction){
-        for(Direction dir:Direction.values()){
-            if(dir.getRowOffset()==(-1)*direction.getRowOffset() &&
-                    dir.getColumnOffset()==(-1)*direction.getColumnOffset()){
+   /* public int getRowDistance(){
+        return Math.abs(from.getRow()-to.getRow());
+    }
+
+    public int getColumnDistance(){
+        return Math.abs(from.getColumn()-to.getColumn());
+    }*/
+
+    public Direction getReverseDirection(Direction direction) {
+        for (Direction dir : Direction.values()) {
+            if (dir.getRowOffset() == (-1) * direction.getRowOffset() &&
+                    dir.getColumnOffset() == (-1) * direction.getColumnOffset()) {
                 return dir;
             }
         }
         return null;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Move move = (Move) o;
+
+        if (from != null ? !from.equals(move.from) : move.from != null) return false;
+        return to != null ? to.equals(move.to) : move.to == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = from != null ? from.hashCode() : 0;
+        result = 31 * result + (to != null ? to.hashCode() : 0);
+        return result;
     }
 
     @Override

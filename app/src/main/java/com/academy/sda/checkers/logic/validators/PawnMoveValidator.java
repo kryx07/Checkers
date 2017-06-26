@@ -28,39 +28,26 @@ public class PawnMoveValidator implements MoveValidator {
     public Move.MoveType validate(Move move) {
 
         logDebug(getValidMovesFrom(move.getFrom()).toString());
-
-        if (!isValidDirection(move) && !isCapturePossible(move)) {
-            logDebug("Invalid Direction");
+        logDebug(move.toString());
+        if (!getValidMovesFrom(move.getFrom()).contains(move)) {
             return MOVE_ILLEGAL;
         }
 
         if (move.getFrom().isNeighbour(move.getTo())) {
             logDebug("Target and source are neighbouring fields");
-            //Regular moves
-            if (board.isFieldEmpty(move.getTo())) {
-                logDebug("The target field is empty");
-                //Pawn is moved(regular move) / flag informs the controller that the it was a regular move and it was final
-                return MOVE_FINAL;
-            }
+            //Pawn is moved(regular move) / flag informs the controller that the it was a regular move and it was final
+            return MOVE_FINAL;
         }
-        if (!isCaptureDistance(move)) {
-            logDebug("The attempted move is not of a capture distance");
-            //Pawn is not moved / flag informs the controller that the it was an illegal move
-            return MOVE_ILLEGAL;
+
+        if (isAnotherCapturePossibleFrom(move.getTo())) {
+            //Pawn is moved(capturing move) / flag informs the controller that the it was a capturing move and it was not final
+            return CAPTURE_NOT_FINAL;
         } else {
-            if (isCapturePossible(move)) {
-                logDebug("Capture is possible");
-                if (isAnotherCapturePossibleFrom(move.getTo())) {
-                    //Pawn is moved(capturing move) / flag informs the controller that the it was a capturing move and it was not final
-                    return CAPTURE_NOT_FINAL;
-                } else {
-                    //Pawn is moved(capturing move) / flag informs the controller that the it was a capturing move and it was final
-                    return CAPTURE_FINAL;
-                }
-            }
+            //Pawn is moved(capturing move) / flag informs the controller that the it was a capturing move and it was final
+            return CAPTURE_FINAL;
         }
-        logDebug("No legal moves!");
-        return MOVE_ILLEGAL;
+        /*logDebug("No legal moves!");
+        return MOVE_ILLEGAL;*/
     }
 
     private boolean isValidDirection(Move move) {
@@ -82,17 +69,25 @@ public class PawnMoveValidator implements MoveValidator {
     }
 
     private boolean isAnotherCapturePossibleFrom(Field field) {
-        return isCapturePossible(new Move(field,
+        Set<Move> validMoves = getValidMovesFrom(field);
+        for(Move move:validMoves){
+            if(isCaptureDistance(move)){
+                return true;
+            }
+        }
+        return false;
+
+        /*return isCapturePossible(new Move(field,
                 new Field(field.getRow() + 2, field.getColumn() + 2))) ||
                 isCapturePossible(new Move(field,
                         new Field(field.getRow() - 2, field.getColumn() - 2))) ||
                 isCapturePossible(new Move(field,
                         new Field(field.getRow() + 2, field.getColumn() - 2))) ||
                 isCapturePossible(new Move(field,
-                        new Field(field.getRow() - 2, field.getColumn() + 2)));
+                        new Field(field.getRow() - 2, field.getColumn() + 2)));*/
     }
 
-    private boolean isCapturePossible(Move move) {
+    /*private boolean isCapturePossible(Move move) {
         boolean capturePossible;
         try {
             capturePossible = board.isFieldEmpty(move.getTo()) && isEnemyInBetween(move);
@@ -103,21 +98,23 @@ public class PawnMoveValidator implements MoveValidator {
         logDebug("Is capture from " + move.getFrom() + " to " + move.getTo() + " possible? " + capturePossible);
         return capturePossible;
 
-    }
+    }*/
 
     private Set<Move> getValidMovesFrom(Field field) {
 
         Set<Move> validMoves = new HashSet<>();
         Field tmpField = field;
         Move potentialMove;
-        for (Move.Direction direction : Move.Direction.values()) {
-            for (int i = 0; i < 2; ++i) {
-                potentialMove = new Move(field, tmpField);
-                if (board.isFieldEmpty(potentialMove.getTo()) && isValidDirection(potentialMove)) {
-                    validMoves.add(potentialMove);
-                } else {
-                    if (isEnemyInBetween(potentialMove)) {
+        for (Move.Direction direction: Move.Direction.values()) {
+            for (int i = 0; i <= 2; ++i) {
+                if (!board.isOutOfBounds(tmpField)) {
+                    potentialMove = new Move(field, tmpField);
+                    if (board.isFieldEmpty(potentialMove.getTo()) && isValidDirection(potentialMove)) {
                         validMoves.add(potentialMove);
+                    } else {
+                        if (isEnemyInBetween(potentialMove)) {
+                            validMoves.add(potentialMove);
+                        }
                     }
                 }
                 tmpField = board.move(tmpField, direction);

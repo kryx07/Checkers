@@ -48,7 +48,7 @@ public class Board {
 
     public boolean isFieldEmpty(Field field) {
         Player thisPlayer = board[field.getRow()][field.getColumn()].getPlayer();
-        logDebug(field + " contains a pawn of: " + thisPlayer);
+        /*logDebug(field + " contains a pawn of: " + thisPlayer);*/
         return thisPlayer == PLAYER_NONE;
     }
 
