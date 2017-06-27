@@ -30,6 +30,7 @@ public class PawnMoveValidator implements MoveValidator {
         logDebug(getValidMovesFrom(move.getFrom()).toString());
         logDebug(move.toString());
         if (!getValidMovesFrom(move.getFrom()).contains(move)) {
+            logDebug("No valid moves from the position");
             return MOVE_ILLEGAL;
         }
 
@@ -70,8 +71,9 @@ public class PawnMoveValidator implements MoveValidator {
 
     private boolean isAnotherCapturePossibleFrom(Field field) {
         Set<Move> validMoves = getValidMovesFrom(field);
-        for(Move move:validMoves){
-            if(isCaptureDistance(move)){
+        logDebug("Valid Moves from captured field: " + validMoves);
+        for (Move move : validMoves) {
+            if (isCaptureDistance(move)) {
                 return true;
             }
         }
@@ -105,19 +107,22 @@ public class PawnMoveValidator implements MoveValidator {
         Set<Move> validMoves = new HashSet<>();
         Field tmpField = field;
         Move potentialMove;
-        for (Move.Direction direction: Move.Direction.values()) {
-            for (int i = 0; i <= 2; ++i) {
+        for (Move.Direction direction : Move.Direction.values()) {
+            for (int i = 0; i < 2; ++i) {
+                tmpField = board.move(tmpField, direction);
                 if (!board.isOutOfBounds(tmpField)) {
                     potentialMove = new Move(field, tmpField);
-                    if (board.isFieldEmpty(potentialMove.getTo()) && isValidDirection(potentialMove)) {
+                    if (board.isFieldEmpty(potentialMove.getTo()) && isValidDirection(potentialMove)
+                            && potentialMove.isRegularDistance()) {
                         validMoves.add(potentialMove);
                     } else {
-                        if (isEnemyInBetween(potentialMove)) {
+                        if (isEnemyInBetween(potentialMove) && potentialMove.isCapturingDistance()) {
                             validMoves.add(potentialMove);
                         }
                     }
                 }
-                tmpField = board.move(tmpField, direction);
+                /////////
+                /////////
             }
             tmpField = field;
         }
